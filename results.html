@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="results-header">
+            <h1>📈 Analysis Results</h1>
+            <p class="timestamp" id="timestamp"></p>
+            <div class="action-buttons">
+                <a href="/" class="btn-secondary">← Go Back</a>
+                <button onclick="downloadReport('csv')" class="btn-primary">Download CSV</button>
+                <button onclick="downloadReport('json')" class="btn-primary">Download JSON</button>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card blue">
+                <div class="metric-icon">💰</div>
+                <div class="metric-content">
+                    <h3>Total Sales</h3>
+                    <p class="metric-value" id="total_sales">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card green">
+                <div class="metric-icon">📊</div>
+                <div class="metric-content">
+                    <h3>Average Sales</h3>
+                    <p class="metric-value" id="average_sales">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card purple">
+                <div class="metric-icon">💵</div>
+                <div class="metric-content">
+                    <h3>Total Profit</h3>
+                    <p class="metric-value" id="total_profit">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card orange">
+                <div class="metric-icon">📈</div>
+                <div class="metric-content">
+                    <h3>Average Profit</h3>
+                    <p class="metric-value" id="average_profit">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card pink">
+                <div class="metric-icon">⭐</div>
+                <div class="metric-content">
+                    <h3>Top Product</h3>
+                    <p class="metric-value" id="top_selling_product">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card teal">
+                <div class="metric-icon">📦</div>
+                <div class="metric-content">
+                    <h3>Products Sold</h3>
+                    <p class="metric-value" id="number_of_products">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card indigo">
+                <div class="metric-icon">👥</div>
+                <div class="metric-content">
+                    <h3>Unique Customers</h3>
+                    <p class="metric-value" id="unique_customers">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card cyan">
+                <div class="metric-icon">🔺</div>
+                <div class="metric-content">
+                    <h3>Highest Transaction</h3>
+                    <p class="metric-value" id="highest_transaction">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card red">
+                <div class="metric-icon">🔻</div>
+                <div class="metric-content">
+                    <h3>Lowest Transaction</h3>
+                    <p class="metric-value" id="lowest_transaction">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card yellow">
+                <div class="metric-icon">📊</div>
+                <div class="metric-content">
+                    <h3>Avg Quantity</h3>
+                    <p class="metric-value" id="average_quantity">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card lime">
+                <div class="metric-icon">🛒</div>
+                <div class="metric-content">
+                    <h3>Total Orders</h3>
+                    <p class="metric-value" id="total_orders">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card amber">
+                <div class="metric-icon">🏷️</div>
+                <div class="metric-content">
+                    <h3>Top Category</h3>
+                    <p class="metric-value" id="most_frequent_category">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card emerald">
+                <div class="metric-icon">🌍</div>
+                <div class="metric-content">
+                    <h3>Best Region</h3>
+                    <p class="metric-value" id="most_profitable_region">-</p>
+                </div>
+            </div>
+
+            <div class="metric-card violet">
+                <div class="metric-icon">📅</div>
+                <div class="metric-content">
+                    <h3>Best Month</h3>
+                    <p class="metric-value" id="month_highest_sales">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card">
+                <h2>Sales by Category</h2>
+                <canvas id="salesCategoryChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h2>Profit by Month</h2>
+                <canvas id="profitMonthChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data = JSON.parse(sessionStorage.getItem('analysisData'));
+        
+        if (!data) {
+            window.location.href = '/';
+        } else {
+            // Display metrics
+            const metrics = data.metrics;
+            document.getElementById('timestamp').textContent = `Analysis performed on: ${metrics.timestamp}`;
+            
+            // Format currency
+            const formatCurrency = (val) => `$${parseFloat(val).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            document.getElementById('total_sales').textContent = formatCurrency(metrics.total_sales);
+            document.getElementById('average_sales').textContent = formatCurrency(metrics.average_sales);
+            document.getElementById('total_profit').textContent = formatCurrency(metrics.total_profit);
+            document.getElementById('average_profit').textContent = formatCurrency(metrics.average_profit);
+            document.getElementById('top_selling_product').textContent = metrics.top_selling_product;
+            document.getElementById('number_of_products').textContent = metrics.number_of_products;
+            document.getElementById('unique_customers').textContent = metrics.unique_customers;
+            document.getElementById('highest_transaction').textContent = formatCurrency(metrics.highest_transaction);
+            document.getElementById('lowest_transaction').textContent = formatCurrency(metrics.lowest_transaction);
+            document.getElementById('average_quantity').textContent = parseFloat(metrics.average_quantity).toFixed(2);
+            document.getElementById('total_orders').textContent = metrics.total_orders;
+            document.getElementById('most_frequent_category').textContent = metrics.most_frequent_category;
+            document.getElementById('most_profitable_region').textContent = metrics.most_profitable_region;
+            document.getElementById('month_highest_sales').textContent = metrics.month_highest_sales;
+            
+            // Sales by Category Chart
+            const categoryCtx = document.getElementById('salesCategoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.sales_by_category),
+                    datasets: [{
+                        label: 'Sales ($)',
+                        data: Object.values(data.sales_by_category),
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(168, 85, 247, 0.8)',
+                            'rgba(251, 146, 60, 0.8)',
+                            'rgba(236, 72, 153, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(16, 185, 129)',
+                            'rgb(168, 85, 247)',
+                            'rgb(251, 146, 60)',
+                            'rgb(236, 72, 153)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Profit by Month Chart
+            const monthCtx = document.getElementById('profitMonthChart').getContext('2d');
+            new Chart(monthCtx, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(data.profit_by_month),
+                    datasets: [{
+                        label: 'Profit ($)',
+                        data: Object.values(data.profit_by_month),
+                        backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                        borderColor: 'rgb(168, 85, 247)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function downloadReport(type) {
+            window.location.href = `/download_report?type=${type}`;
+        }
+    </script>
+</body>
+</html>

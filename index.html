@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Analyzer</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    
+    <div class="container">
+        <div class="upload-card">
+            <h1> Shopping Mart Data Analyst</h1>
+            <p class="subtitle">Upload your sales data CSV file for comprehensive analysis</p>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="file-input-wrapper">
+                    <input type="file" id="csvFile" name="file" accept=".csv" required>
+                    <label for="csvFile" class="file-label">
+                        <span class="file-icon">📁</span>
+                        <span class="file-text">Choose CSV File</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <span>Analyze Data</span>
+                </button>
+            </form>
+            
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Analyzing your data...</p>
+            </div>
+            
+            <div id="error" class="error hidden"></div>
+            
+            <div class="info-box">
+                <h3>Sample CSV Format:</h3>
+                <p>Date, Product, Category, Quantity, Sales, Profit, Customer, Region</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('csvFile');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            if (!fileInput.files[0]) {
+                error.textContent = 'Please select a CSV file';
+                error.classList.remove('hidden');
+                return;
+            }
+            
+            error.classList.add('hidden');
+            loading.classList.remove('hidden');
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store data in sessionStorage and redirect
+                    sessionStorage.setItem('analysisData', JSON.stringify(data));
+                    window.location.href = '/results';
+                } else {
+                    error.textContent = data.error || 'An error occurred';
+                    error.classList.remove('hidden');
+                    loading.classList.add('hidden');
+                }
+            } catch (err) {
+                error.textContent = 'Failed to analyze file: ' + err.message;
+                error.classList.remove('hidden');
+                loading.classList.add('hidden');
+            }
+        });
+        
+        document.getElementById('csvFile').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                document.querySelector('.file-text').textContent = fileName;
+            }
+        });
+    </script>
+</body>
+</html>
